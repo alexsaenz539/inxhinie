@@ -1915,3 +1915,4 @@ select.input-control option {
     height: auto;
   }
 }
+#quote-submit-status{min-height:1.4em;margin:.9rem 0 0;color:var(--gold-highlight);font-size:.82rem;text-align:center}

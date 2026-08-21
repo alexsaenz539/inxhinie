@@ -3,7 +3,7 @@
  * Engineered with IntersectionObserver, Kinetic Physics, and WhatsApp Bridge
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+window.initializeLandingInteractions = () => {
   
   // 1. Viewport Entry Animation Engine (IntersectionObserver)
   const revealElements = document.querySelectorAll('.reveal-on-scroll');
@@ -133,11 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
   if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
-  document.addEventListener('keydown', (e) => {
+  const onKeyDown = (e) => {
     if (e.key === 'Escape' && lightboxModal && lightboxModal.classList.contains('active')) {
       closeLightbox();
     }
-  });
+  };
+  document.addEventListener('keydown', onKeyDown);
 
   // 6. Bento Service Action Bridge to Calculator
   const openQuoteButtons = document.querySelectorAll('.open-quote-btn');
@@ -182,20 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const area = Number(document.getElementById('calc-dimensions')?.value || 0);
     const quality = document.getElementById('calc-quality')?.value || 'standard';
     const additional = document.getElementById('calc-additional')?.value || 'none';
-    const baseRates = {
-      'Pérgola Residencial / Comercial': 5200,
-      'Estructura Metálica & Semi-Arcos': 4400,
-      'Domo & Techumbre': 3900,
-      'Acabados Imitación Madera': 2300,
-      'Remodelación & Proyecto 3D': 6100
-    };
-    const qualityMultiplier = { standard: 1, premium: 1.22, alto: 1.45 };
-    const additionalRates = { none: 0, demolition: 420, lighting: 680, design: 250 };
-    const rate = baseRates[service];
+    const catalog = window.quoteCatalog;
+    const rate = catalog?.services.find(item => item.name === service)?.rate;
+    const qualityMultiplier = catalog?.qualities.find(item => item.key === quality)?.multiplier ?? 1;
+    const additionalRate = catalog?.addons.find(item => item.key === additional)?.rate ?? 0;
 
     if (!area || !rate) return null;
-    const total = (area * rate * qualityMultiplier[quality]) + (area * additionalRates[additional]);
-    return { low: Math.round(total * 0.9), high: Math.round(total * 1.12) };
+    const total = (area * rate * qualityMultiplier) + (area * additionalRate);
+    return { low: Math.round(total * (catalog?.varianceLow ?? .9)), high: Math.round(total * (catalog?.varianceHigh ?? 1.12)) };
   }
 
   function formatCurrency(amount) {
@@ -233,6 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const notes = document.getElementById('calc-notes')?.value || '';
       const estimate = getEstimate();
 
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts.shift() || 'Cliente';
+      const lastName = nameParts.join(' ');
+      const description = `${property}. Material o cubierta: ${material}. Nivel de materiales: ${quality}. Servicio adicional: ${additional}. ${notes || 'Solicitud generada desde el cotizador web.'}`;
       const officialPhone = '526183677341';
 
       // Clean, professional WhatsApp Message
@@ -257,7 +256,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const encoded = encodeURIComponent(msg);
       const url = `https://wa.me/${officialPhone}?text=${encoded}`;
 
-      window.open(url, '_blank');
+      window.dispatchEvent(new CustomEvent('inxhinie:quote-submit', {
+        detail: {
+          input: {
+            firstName,
+            lastName,
+            phone,
+            email: '',
+            city: location,
+            service,
+            area: Number(dimensions) || null,
+            budget: estimate ? `${formatCurrency(estimate.low)} - ${formatCurrency(estimate.high)} MXN` : '',
+            startDate: '',
+            description,
+            estimateLow: estimate?.low ?? null,
+            estimateHigh: estimate?.high ?? null,
+          },
+          whatsappUrl: url,
+        },
+      }));
     });
   }
 
@@ -266,4 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (yearHolder) {
     yearHolder.textContent = new Date().getFullYear();
   }
-});
+  return () => {
+    revealObserver.disconnect();
+    navObserver.disconnect();
+    document.removeEventListener('keydown', onKeyDown);
+    document.body.style.overflow = '';
+  };
+};

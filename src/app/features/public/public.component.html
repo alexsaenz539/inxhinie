@@ -567,11 +567,7 @@
                   <label for="calc-service"><i class="ri-building-line"></i> Tipo de Especialidad</label>
                   <select id="calc-service" class="input-control" required>
                     <option value="" disabled selected>Selecciona una opción</option>
-                    <option value="Pérgola Residencial / Comercial">Pérgola (Terraza, Patio o Roof)</option>
-                    <option value="Estructura Metálica & Semi-Arcos">Estructura & Semi-Arcos para Cochera</option>
-                    <option value="Domo & Techumbre">Domo / Nave Industrial / Cancha</option>
-                    <option value="Acabados Imitación Madera">Deck PVC / Lambrín Acanalado</option>
-                    <option value="Remodelación & Proyecto 3D">Diseño Arquitectónico & Remodelación</option>
+                    @for (service of quoteCatalog().services; track service.name) { <option [value]="service.name">{{ service.name }}</option> }
                   </select>
                 </div>
 
@@ -579,14 +575,7 @@
                   <label for="calc-material"><i class="ri-stack-line"></i> Material o Cubierta</label>
                   <select id="calc-material" class="input-control" required>
                     <option value="" disabled selected>Selecciona el material</option>
-                    <option value="Membrana Tensada Nacional">Membrana Tensada Nacional</option>
-                    <option value="Membrana Importada de Alta Densidad">Membrana Importada Premium</option>
-                    <option value="Lona Arquitectónica Impermeable">Lona Arquitectónica Impermeable</option>
-                    <option value="Policarbonato Celular / Sólido">Policarbonato Celular o Sólido</option>
-                    <option value="Deck PVC / Lambrín Madera">Deck PVC & Lambrín Imitación Madera</option>
-                    <option value="Panel Aislante Térmico">Panel Aislante Térmico</option>
-                    <option value="Lámina Pintro / Galvanizada">Lámina Pintro / Galvanizada</option>
-                    <option value="Por definir (requiero asesoría técnica)">Requiero asesoría técnica</option>
+                    @for (material of quoteCatalog().materials; track material) { <option [value]="material">{{ material }}</option> }
                   </select>
                 </div>
 
@@ -598,10 +587,7 @@
                 <div class="quote-input-field">
                   <label for="calc-property"><i class="ri-community-line"></i> Tipo de Inmueble</label>
                   <select id="calc-property" class="input-control" required>
-                    <option value="Residencial / Casa Habitación" selected>Residencial / Casa Habitación</option>
-                    <option value="Comercial / Restaurante / Negocio">Comercial / Restaurante / Negocio</option>
-                    <option value="Industrial / Bodega / Nave">Industrial / Bodega / Nave</option>
-                    <option value="Escolar / Recreativo">Escolar / Unidad Deportiva</option>
+                    @for (property of quoteCatalog().properties; track property; let first = $first) { <option [value]="property" [selected]="first">{{ property }}</option> }
                   </select>
                 </div>
 
@@ -623,19 +609,14 @@
                 <div class="quote-input-field">
                   <label for="calc-quality"><i class="ri-medal-line"></i> Nivel de materiales</label>
                   <select id="calc-quality" class="input-control" required>
-                    <option value="standard" selected>Estándar</option>
-                    <option value="premium">Premium</option>
-                    <option value="alto">Alta especificación</option>
+                    @for (quality of quoteCatalog().qualities; track quality.key; let first = $first) { <option [value]="quality.key" [selected]="first">{{ quality.label }}</option> }
                   </select>
                 </div>
 
                 <div class="quote-input-field">
                   <label for="calc-additional"><i class="ri-add-circle-line"></i> Servicio adicional</label>
                   <select id="calc-additional" class="input-control">
-                    <option value="none" selected>Sin adicionales</option>
-                    <option value="demolition">Demolición o retiro</option>
-                    <option value="lighting">Iluminación integrada</option>
-                    <option value="design">Modelado 3D previo</option>
+                    @for (addon of quoteCatalog().addons; track addon.key; let first = $first) { <option [value]="addon.key" [selected]="first">{{ addon.label }}</option> }
                   </select>
                 </div>
 
@@ -664,6 +645,7 @@
                   <i class="ri-lock-2-line"></i>
                   <span>Atención directa al teléfono oficial +52 (618) 367-7341</span>
                 </div>
+                <p id="quote-submit-status" aria-live="polite"></p>
               </div>
 
             </form>
