@@ -93,6 +93,11 @@ export class SupabaseService {
     return this.client.auth.signInWithPassword({ email, password });
   }
 
+  async setPassword(password: string) {
+    if (!this.client) return { error: new Error('Supabase no está configurado.') };
+    return this.client.auth.updateUser({ password });
+  }
+
   async isAuthenticated() {
     if (!this.client) return false;
     const { data } = await this.client.auth.getSession();

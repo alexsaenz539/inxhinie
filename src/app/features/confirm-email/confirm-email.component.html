@@ -1,0 +1,47 @@
+<main class="login-page">
+  <section class="login-visual" aria-label="INXHINIE Construcciones">
+    <img src="assets/images/hero-showcase.jpg" alt="Proyecto arquitectónico INXHINIE">
+    <div class="visual-scrim"></div>
+    <a class="visual-brand" routerLink="/" aria-label="Volver al inicio de INXHINIE">
+      <img src="assets/images/logo-inxhinie.png" alt="">
+      <span>INXHINIE<small>CONSTRUCCIONES</small></span>
+    </a>
+    <div class="visual-copy">
+      <p>PLATAFORMA INTERNA</p>
+      <h1>Obra precisa.<br>Operación clara.</h1>
+      <span>Durango, México</span>
+    </div>
+    <div class="visual-index"><span>01</span><i></i><span>ACTIVAR ACCESO</span></div>
+  </section>
+
+  <section class="login-panel">
+    <a class="back-link" routerLink="/"><i class="ri-arrow-left-line"></i> Volver al sitio</a>
+    <div class="form-wrap">
+      <div class="mobile-brand"><img src="assets/images/logo-inxhinie.png" alt=""><span>INXHINIE<small>CONSTRUCCIONES</small></span></div>
+      <p class="overline">ACTIVACIÓN DE ACCESO</p>
+      <h2>Define tu contraseña.</h2>
+      <p class="intro">Confirma tu cuenta creando una contraseña para ingresar al panel operativo.</p>
+
+      @if (loading()) {
+        <div class="notice" role="status"><i class="ri-loader-4-line spin"></i><div><strong>Validando enlace</strong><span>Espera un momento.</span></div></div>
+      } @else if (validLink()) {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <label for="password">Nueva contraseña</label>
+          <div class="input-wrap" [class.invalid]="password.touched && password.invalid"><i class="ri-lock-password-line"></i><input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" [attr.aria-invalid]="password.touched && password.invalid"><button type="button" class="toggle-password" (click)="showPassword.set(!showPassword())" [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"><i [class]="showPassword() ? 'ri-eye-off-line' : 'ri-eye-line'"></i></button></div>
+          @if (password.touched && password.invalid) { <p class="field-error">Usa al menos 8 caracteres.</p> }
+
+          <label for="confirmation">Confirmar contraseña</label>
+          <div class="input-wrap" [class.invalid]="confirmation.touched && confirmation.invalid"><i class="ri-lock-password-line"></i><input id="confirmation" [type]="showPassword() ? 'text' : 'password'" formControlName="confirmation" autocomplete="new-password" placeholder="Repite tu contraseña" [attr.aria-invalid]="confirmation.touched && confirmation.invalid"></div>
+          @if (confirmation.touched && confirmation.invalid) { <p class="field-error">Confirma tu contraseña.</p> }
+
+          @if (error()) { <p class="error" role="alert"><i class="ri-error-warning-line"></i>{{ error() }}</p> }
+          <button class="submit" type="submit" [disabled]="saving()"><span>{{ saving() ? 'Guardando contraseña' : 'Activar mi acceso' }}</span><i [class]="saving() ? 'ri-loader-4-line spin' : 'ri-arrow-right-up-line'"></i></button>
+        </form>
+      } @else {
+        <p class="error" role="alert"><i class="ri-error-warning-line"></i>{{ error() }}</p>
+        <p class="help">Pide al administrador que reenvíe la invitación desde Supabase.</p>
+      }
+    </div>
+    <p class="copyright">© 2026 INXHINIE Construcciones</p>
+  </section>
+</main>

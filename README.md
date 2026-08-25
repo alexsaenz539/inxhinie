@@ -25,5 +25,6 @@ El proyecto incluye `vercel.json` para generar Angular y servir las rutas de la 
 1. Importa el repositorio en Vercel.
 2. En **Settings > Environment Variables**, agrega `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `Production` y `Preview`.
 3. Vuelve a desplegar. La compilación inserta ambos valores en el bundle de Angular.
+4. En Supabase, configura **Authentication > URL Configuration**: usa `https://tu-dominio.com/confirmar-correo` como **Site URL** y agrega esa misma dirección (más `http://localhost:4200/confirmar-correo`) a **Redirect URLs**. Así, los enlaces de invitación enviados desde Supabase llevan al usuario a definir su contraseña.
 
 `SUPABASE_ANON_KEY` es una clave pública de cliente y debe estar protegida con las políticas RLS de Supabase. Nunca configures una clave `service_role` en Vercel para esta aplicación.
