@@ -26,7 +26,7 @@
         <ul class="island-nav-links" id="nav-links">
           <li><a href="#inicio" class="nav-item active">Inicio</a></li>
           <li><a href="#servicios" class="nav-item">Especialidades</a></li>
-          <li><a href="#bento-proyectos" class="nav-item">Proyectos</a></li>
+          <li><a href="#inxhinie-proyectos" class="nav-item">Proyectos</a></li>
           <li><a href="#metodologia" class="nav-item">Proceso 3D</a></li>
           <li><a href="#cotizador" class="nav-item">Cotizador</a></li>
         </ul>
@@ -53,7 +53,7 @@
         <ul class="mobile-links-list">
           <li><a href="#inicio" class="mobile-nav-link">Inicio</a></li>
           <li><a href="#servicios" class="mobile-nav-link">Especialidades</a></li>
-          <li><a href="#bento-proyectos" class="mobile-nav-link">Proyectos</a></li>
+          <li><a href="#inxhinie-proyectos" class="mobile-nav-link">Proyectos</a></li>
           <li><a href="#metodologia" class="mobile-nav-link">Proceso 3D</a></li>
           <li><a href="#cotizador" class="mobile-nav-link">Cotizador Rápido</a></li>
           <li><a href="#contacto" class="mobile-nav-link">Contacto Directo</a></li>
@@ -354,7 +354,7 @@
     </section>
 
     <!-- DESIRE (Portfolio Gallery & Lightbox) -->
-    <section class="section-chapter" id="bento-proyectos">
+    <section class="section-chapter" id="inxhinie-proyectos">
       <div class="container">
         
         <div class="chapter-header reveal-on-scroll">
@@ -363,127 +363,28 @@
           <p class="chapter-lead">Explora la calidad de ensamble, estética de materiales y terminados de nuestras instalaciones.</p>
         </div>
 
-        <!-- Filter Pills -->
-        <div class="gallery-filter-island reveal-on-scroll">
-          <button class="filter-pill active" data-filter="all">Todos</button>
-          <button class="filter-pill" data-filter="pergolas">Pérgolas</button>
-          <button class="filter-pill" data-filter="estructuras">Estructuras</button>
-          <button class="filter-pill" data-filter="madera">Deck & Lambrín</button>
-          <button class="filter-pill" data-filter="domos">Domos</button>
-        </div>
-
-        <!-- Portfolio Bento Grid -->
-        <div class="portfolio-bento-grid">
-
-          <!-- Project 1: Deck PVC + Policarbonato -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="pergolas madera">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/proyecto-deck-pvc.jpg" alt="Pérgola con Deck PVC y Policarbonato" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Pérgola Mixta</span>
-                <h4 class="port-title">Deck PVC + Policarbonato</h4>
-                <p class="port-desc">Cubierta con duela sintética y sección traslúcida para iluminación natural.</p>
-                <button class="port-btn-zoom" data-src="assets/images/proyecto-deck-pvc.jpg" data-title="Pérgola con Deck PVC y Tragaluz de Policarbonato">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
+        @if (portfolioProjects().length) {
+          <div class="gallery-filter-island">
+            <button class="filter-pill" [class.active]="portfolioFilter() === 'all'" (click)="portfolioFilter.set('all')">Todos</button>
+            @for (category of portfolioCategories(); track category) { <button class="filter-pill" [class.active]="portfolioFilter() === category" (click)="portfolioFilter.set(category)">{{ category }}</button> }
           </div>
-
-          <!-- Project 2: Semi-Arcos Traslapados -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="estructuras">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/proyecto-semi-arcos.jpg" alt="Semi-Arcos Traslapados" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Estructura Curva</span>
-                <h4 class="port-title">Semi-Arcos Traslapados</h4>
-                <p class="port-desc">Cubierta tensada blanca nacional para cochera residencial de lujo.</p>
-                <button class="port-btn-zoom" data-src="assets/images/proyecto-semi-arcos.jpg" data-title="Semi-Arcos Traslapados con Membrana Tensada">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
+          <div class="portfolio-bento-grid">
+            @for (project of visiblePortfolioProjects(); track project.id) {
+              @if (portfolioImage(project); as image) { <div class="portfolio-card-shell"><div class="portfolio-card-inner"><img [src]="image" [alt]="project.portfolio_media[0]?.alt_text || project.name" class="port-img" loading="lazy"><div class="port-overlay"><span class="port-category">{{ project.portfolio_categories?.name || 'Proyecto' }}</span><h4 class="port-title">{{ project.name }}</h4><p class="port-desc">{{ project.description }}</p><button class="port-btn-zoom" type="button" (click)="openPortfolioLightbox(project)"><span>Ampliar obra</span><i class="ri-fullscreen-line"></i></button></div></div></div> }
+            }
           </div>
-
-          <!-- Project 3: Pérgola Básica Minimalista -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="pergolas">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/proyecto-pergola-basica.jpg" alt="Pérgola Básica Minimalista" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Pérgola Residencial</span>
-                <h4 class="port-title">Pérgola Minimalista con Lona</h4>
-                <p class="port-desc">Estructura de acero gris grafito con lona arquitectónica impermeable.</p>
-                <button class="port-btn-zoom" data-src="assets/images/proyecto-pergola-basica.jpg" data-title="Pérgola Minimalista con Lona Arquitectónica">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 4: Domo Recreativo -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="domos estructuras">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/servicio-domos.jpg" alt="Domo Escolar y Recreativo" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Macro-Estructura</span>
-                <h4 class="port-title">Domo Recreativo Multideportivo</h4>
-                <p class="port-desc">Estructura autoportante de acero y membrana para canchas y pabellones.</p>
-                <button class="port-btn-zoom" data-src="assets/images/servicio-domos.jpg" data-title="Domo Recreativo Multideportivo">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 5: Pérgola Iluminada -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="pergolas madera">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/servicio-pergolas.jpg" alt="Pérgola Terraza con Iluminación" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Diseño Integral</span>
-                <h4 class="port-title">Pérgola Jardín con Iluminación LED</h4>
-                <p class="port-desc">Integración de vigas estructurales, iluminación cálida y membrana tensada.</p>
-                <button class="port-btn-zoom" data-src="assets/images/servicio-pergolas.jpg" data-title="Pérgola Jardín con Iluminación LED">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Project 6: Carport Tensado -->
-          <div class="portfolio-card-shell reveal-on-scroll" data-category="estructuras">
-            <div class="portfolio-card-inner">
-              <img src="assets/images/servicio-estructuras.jpg" alt="Cochera Tensada de Alta Resistencia" class="port-img" loading="lazy">
-              <div class="port-overlay">
-                <span class="port-category">Protección Vehicular</span>
-                <h4 class="port-title">Carport Tensado Residencial</h4>
-                <p class="port-desc">Protección contra granizo y rayos solares con perfilería blanca y membrana importada.</p>
-                <button class="port-btn-zoom" data-src="assets/images/servicio-estructuras.jpg" data-title="Carport Tensado Residencial">
-                  <span>Ampliar Obra</span>
-                  <i class="ri-fullscreen-line"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        } @else if (!portfolioLoading()) { <p class="portfolio-public-empty">Próximamente compartiremos una selección de nuestros proyectos.</p> }
 
       </div>
     </section>
 
     <!-- Lightbox Modal -->
-    <div class="lightbox-modal-wrap" id="lightbox-modal">
-      <div class="lightbox-backdrop" id="lightbox-backdrop"></div>
+    <div class="lightbox-modal-wrap" id="lightbox-modal" [class.active]="portfolioLightbox()">
+      <div class="lightbox-backdrop" id="lightbox-backdrop" (click)="closePortfolioLightbox()"></div>
       <div class="lightbox-bezel">
-        <button class="lightbox-close-btn" id="lightbox-close" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+        <button class="lightbox-close-btn" id="lightbox-close" aria-label="Cerrar" (click)="closePortfolioLightbox()"><i class="ri-close-line"></i></button>
         <div class="lightbox-core">
-          <img src="" alt="Ampliación de Proyecto" id="lightbox-image" class="lightbox-image">
-          <div class="lightbox-caption" id="lightbox-caption"></div>
+          @if (portfolioLightbox(); as lightbox) { @if (lightbox.project.portfolio_media.length > 1) { <button class="lightbox-navigation previous" type="button" (click)="changePortfolioLightboxImage(-1)" aria-label="Ver imagen anterior"><i class="ri-arrow-left-s-line"></i></button><button class="lightbox-navigation next" type="button" (click)="changePortfolioLightboxImage(1)" aria-label="Ver imagen siguiente"><i class="ri-arrow-right-s-line"></i></button> }<img [src]="lightboxImage()" [alt]="lightboxTitle()" id="lightbox-image" class="lightbox-image"><div class="lightbox-caption" id="lightbox-caption">{{ lightboxTitle() }} @if (lightbox.project.portfolio_media.length > 1) { <span>{{ lightbox.index + 1 }} / {{ lightbox.project.portfolio_media.length }}</span> }</div> }
         </div>
       </div>
     </div>
@@ -565,7 +466,7 @@
 
                 <div class="quote-input-field">
                   <label for="calc-service"><i class="ri-building-line"></i> Tipo de Especialidad</label>
-                  <select id="calc-service" class="input-control" required>
+                  <select id="calc-service" class="input-control" required (change)="selectQuoteService($any($event.target).value)">
                     <option value="" disabled selected>Selecciona una opción</option>
                     @for (service of quoteCatalog().services; track service.name) { <option [value]="service.name">{{ service.name }}</option> }
                   </select>
@@ -573,9 +474,9 @@
 
                 <div class="quote-input-field">
                   <label for="calc-material"><i class="ri-stack-line"></i> Material o Cubierta</label>
-                  <select id="calc-material" class="input-control" required>
+                  <select id="calc-material" class="input-control" required [disabled]="!selectedQuoteService()" [value]="selectedQuoteMaterial()" (change)="selectQuoteMaterial($any($event.target).value)">
                     <option value="" disabled selected>Selecciona el material</option>
-                    @for (material of quoteCatalog().materials; track material) { <option [value]="material">{{ material }}</option> }
+                    @for (material of availableQuoteMaterials(); track material) { <option [value]="material">{{ material }}</option> }
                   </select>
                 </div>
 

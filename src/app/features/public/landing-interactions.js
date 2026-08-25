@@ -160,6 +160,7 @@ window.initializeLandingInteractions = () => {
             (serviceTarget.includes('madera') && (val.includes('madera') || text.includes('madera') || text.includes('deck') || text.includes('lambrín')))
           ) {
             calcServiceSelect.selectedIndex = i;
+            calcServiceSelect.dispatchEvent(new Event('change', { bubbles: true }));
             calcServiceSelect.focus();
             break;
           }

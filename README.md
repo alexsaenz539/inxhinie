@@ -8,11 +8,15 @@ Ejecuta `npm start` para iniciar la aplicación. El sitio público está en `/` 
 
 ## Supabase
 
-1. Ejecuta `supabase/migrations/202608200001_initial_schema.sql` en el SQL Editor del proyecto Supabase.
+1. Ejecuta `supabase/migrations/202608200001_initial_schema.sql` y después `supabase/migrations/202608250001_portfolio_categories.sql` en el SQL Editor del proyecto Supabase. Crean el bucket público `portfolio`, sus políticas de Storage y el catálogo de categorías de proyectos.
 2. Crea un usuario en Supabase Auth y agrega su perfil con rol `admin` en la tabla `profiles`.
 3. Para una compilación local con Supabase, define `SUPABASE_URL` y `SUPABASE_ANON_KEY` en la terminal antes de ejecutar `npm run build`. Usa `.env.example` únicamente como referencia de nombres y no agregues credenciales reales al repositorio.
 
 Mientras Supabase no esté configurado, `/admin` muestra datos de demostración. Las imágenes originales se mantienen en `assets/images`.
+
+### Portafolio
+
+El módulo **Portafolio** de `/admin` crea proyectos, publica o despublica obras y carga imágenes al bucket `portfolio`. Para cargar archivos, el usuario autenticado debe tener un perfil activo en `public.profiles`; no uses una clave `service_role` en el navegador.
 
 ## Despliegue en Vercel
 

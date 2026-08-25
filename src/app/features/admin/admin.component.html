@@ -1,77 +1,1103 @@
 <div class="admin-shell">
   <aside class="admin-sidebar">
-    <a class="admin-brand" routerLink="/"><img src="assets/images/logo-inxhinie.png" alt="INXHINIE"><span>INXHINIE<small>CONSTRUCCIONES</small></span></a>
+    <a class="admin-brand" routerLink="/"
+      ><img src="assets/images/logo-inxhinie.png" alt="INXHINIE" /><span
+        >INXHINIE<small>CONSTRUCCIONES</small></span
+      ></a
+    >
+    <button
+      class="admin-menu-toggle"
+      type="button"
+      [attr.aria-expanded]="mobileMenuOpen()"
+      [attr.aria-label]="mobileMenuOpen() ? 'Cerrar menú' : 'Abrir menú'"
+      (click)="mobileMenuOpen.set(!mobileMenuOpen())"
+    >
+      <i [class]="mobileMenuOpen() ? 'ri-close-line' : 'ri-menu-line'"></i>
+    </button>
     <nav aria-label="Administración">
-      <button [class.active]="menu() === 'dashboard'" (click)="menu.set('dashboard')"><i class="ri-layout-grid-line"></i> Resumen</button>
-      <button [class.active]="menu() === 'leads'" (click)="menu.set('leads')"><i class="ri-team-line"></i> Prospectos <span>{{ leads().length }}</span></button>
-      <button [class.active]="menu() === 'portfolio'" (click)="menu.set('portfolio')"><i class="ri-image-line"></i> Portafolio</button>
-      <button [class.active]="menu() === 'catalog'" (click)="openCatalog()"><i class="ri-price-tag-3-line"></i> Catálogos</button>
+      <button
+        [class.active]="menu() === 'dashboard'"
+        (click)="navigateTo('dashboard')"
+      >
+        <i class="ri-layout-grid-line"></i> Resumen
+      </button>
+      <button [class.active]="menu() === 'leads'" (click)="navigateTo('leads')">
+        <i class="ri-team-line"></i> Prospectos
+        <span>{{ leads().length }}</span>
+      </button>
+      <button [class.active]="menu() === 'portfolio'" (click)="openPortfolio()">
+        <i class="ri-image-line"></i> Portafolio
+      </button>
+      <button [class.active]="menu() === 'catalog'" (click)="openCatalog()">
+        <i class="ri-price-tag-3-line"></i> Catálogos
+      </button>
     </nav>
-    <div class="sidebar-user"><span>Panel operativo</span><strong>INXHINIE</strong></div>
-    <button class="logout" (click)="logout()"><i class="ri-logout-box-r-line"></i> Cerrar sesión</button>
+    <div class="sidebar-user">
+      <span>Panel operativo</span><strong>INXHINIE</strong>
+      <div class="storage-compact" [style.--storage-used]="storageUsagePercent() + '%'">
+        <i class="storage-compact-dot"></i>
+        <span>ALMACENAMIENTO</span>
+        <b>{{ formatStorage(storageUsageBytes()) }} / {{ formatStorage(storageQuotaBytes) }}</b>
+        <span class="storage-tooltip" role="tooltip">
+          <strong>Almacenamiento</strong>
+          <small>Uso: {{ formatStorage(storageUsageBytes()) }}</small>
+          <small>Restante: {{ formatStorage(storageRemainingBytes()) }}</small>
+          <small>Ocupado: {{ storagePercentLabel() }}</small>
+        </span>
+      </div>
+    </div>
+    <button class="logout" (click)="logout()">
+      <i class="ri-logout-box-r-line"></i> Cerrar sesión
+    </button>
   </aside>
+  <div
+    class="admin-mobile-menu"
+    [class.open]="mobileMenuOpen()"
+    (click)="mobileMenuOpen.set(false)"
+  >
+    <nav
+      class="admin-mobile-menu-panel"
+      aria-label="Administración móvil"
+      (click)="$event.stopPropagation()"
+    >
+      <span>Panel operativo</span>
+      <button [class.active]="menu() === 'dashboard'" (click)="navigateTo('dashboard')"><i class="ri-layout-grid-line"></i>Resumen</button>
+      <button [class.active]="menu() === 'leads'" (click)="navigateTo('leads')"><i class="ri-team-line"></i>Prospectos <b>{{ leads().length }}</b></button>
+      <button [class.active]="menu() === 'portfolio'" (click)="openPortfolio()"><i class="ri-image-line"></i>Portafolio</button>
+      <button [class.active]="menu() === 'catalog'" (click)="openCatalog()"><i class="ri-price-tag-3-line"></i>Catálogos</button>
+      <button class="admin-mobile-logout" (click)="logout()"><i class="ri-logout-box-r-line"></i>Cerrar sesión</button>
+    </nav>
+  </div>
 
   <main class="admin-main">
-    <header class="admin-header"><div><p>OPERACIÓN COMERCIAL</p><h1>{{ menu() === 'dashboard' ? 'Tablero de solicitudes' : menu() === 'leads' ? 'Prospectos y solicitudes' : menu() === 'portfolio' ? 'Portafolio de proyectos' : 'Catálogos y reglas' }}</h1></div><a routerLink="/" target="_blank"><i class="ri-external-link-line"></i> Ver sitio</a></header>
-    @if (message()) { <div class="admin-notice"><i class="ri-information-line"></i>{{ message() }}</div> }
+    <header class="admin-header">
+      <div>
+        <p>OPERACIÓN COMERCIAL</p>
+        <h1>
+          {{
+            menu() === "dashboard"
+              ? "Tablero de solicitudes"
+              : menu() === "leads"
+                ? "Prospectos y solicitudes"
+                : menu() === "portfolio"
+                  ? "Portafolio de proyectos"
+                  : "Catálogos y reglas"
+          }}
+        </h1>
+      </div>
+      <a routerLink="/" target="_blank"
+        ><i class="ri-external-link-line"></i> Ver sitio</a
+      >
+    </header>
+    @if (message()) {
+      <div class="admin-notice">
+        <i class="ri-information-line"></i>{{ message() }}
+      </div>
+    }
 
-    @if (loading()) { <section class="skeleton"><i></i><i></i><i></i></section> }
-    @else if (menu() === 'dashboard') {
+    @if (loading()) {
+      <section class="skeleton"><i></i><i></i><i></i></section>
+    } @else if (menu() === "dashboard") {
       <section class="metric-strip">
-        <article><span>Nuevas</span><strong>{{ count('new') }}</strong><small>Sin atender</small></article>
-        <article><span>En seguimiento</span><strong>{{ count('contacted') + count('visit_scheduled') + count('quoting') + count('negotiation') }}</strong><small>Conversación activa</small></article>
-        <article><span>Aceptadas</span><strong>{{ count('accepted') }}</strong><small>Por convertir a proyecto</small></article>
-        <article><span>Fuera del flujo</span><strong>{{ hiddenCount() }}</strong><small>Canceladas o sin respuesta</small></article>
+        <article>
+          <span>Nuevas</span><strong>{{ count("new") }}</strong
+          ><small>Sin atender</small>
+        </article>
+        <article>
+          <span>En seguimiento</span
+          ><strong>{{
+            count("contacted") +
+              count("visit_scheduled") +
+              count("quoting") +
+              count("negotiation")
+          }}</strong
+          ><small>Conversación activa</small>
+        </article>
+        <article>
+          <span>Aceptadas</span><strong>{{ count("accepted") }}</strong
+          ><small>Por convertir a proyecto</small>
+        </article>
+        <article>
+          <span>Fuera del flujo</span><strong>{{ hiddenCount() }}</strong
+          ><small>Canceladas o sin respuesta</small>
+        </article>
       </section>
 
-      <section class="board-toolbar"><div><h2>Solicitudes recientes</h2><p>Arrastra una tarjeta para avanzar el seguimiento comercial.</p></div><div class="board-filters"><button class="new-request" (click)="newRequestOpen.set(true)"><i class="ri-add-line"></i> Nueva solicitud</button><label><i class="ri-search-line"></i><input [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Buscar prospecto"></label><select [ngModel]="sourceFilter()" (ngModelChange)="sourceFilter.set($event)"><option value="all">Todos los orígenes</option><option value="website">Sitio web</option><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="referral">Referido</option></select></div></section>
+      <section class="board-toolbar">
+        <div>
+          <h2>Solicitudes recientes</h2>
+          <p>Arrastra una tarjeta para avanzar el seguimiento comercial.</p>
+        </div>
+        <div class="board-filters">
+          <button class="new-request" (click)="newRequestOpen.set(true)">
+            <i class="ri-add-line"></i> Nueva solicitud</button
+          ><label
+            ><i class="ri-search-line"></i
+            ><input
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+              placeholder="Buscar prospecto" /></label
+          ><select
+            [ngModel]="sourceFilter()"
+            (ngModelChange)="sourceFilter.set($event)"
+          >
+            <option value="all">Todos los orígenes</option>
+            <option value="website">Sitio web</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="instagram">Instagram</option>
+            <option value="referral">Referido</option>
+          </select>
+        </div>
+      </section>
 
       <section class="kanban-board" aria-label="Tablero de solicitudes">
         @for (column of boardColumns; track column.status) {
-          <article class="kanban-column" [attr.data-accent]="column.accent" (dragover)="$event.preventDefault()" (drop)="dropOn(column.status, $event)">
-            <header><span class="column-dot"></span><h3>{{ column.label }}</h3><b>{{ visibleLeads(column.status).length }}</b></header>
+          <article
+            class="kanban-column"
+            [attr.data-accent]="column.accent"
+            (dragover)="$event.preventDefault()"
+            (drop)="dropOn(column.status, $event)"
+          >
+            <header>
+              <span class="column-dot"></span>
+              <h3>{{ column.label }}</h3>
+              <b>{{ visibleLeads(column.status).length }}</b>
+            </header>
             <div class="kanban-cards">
               @for (lead of visibleLeads(column.status); track lead.id) {
-                <button class="lead-card" draggable="true" (dragstart)="startDrag(lead, $event)" (dragend)="draggedLead.set(null)" (click)="selectedLead.set(lead)">
-                  <div class="card-top"><span class="lead-avatar">{{ initials(lead) }}</span><span>{{ date(lead.created_at) }}</span></div>
-                  <strong>{{ name(lead) }}</strong><span class="lead-service">{{ service(lead) }}</span>
-                  <div class="card-meta"><span><i class="ri-map-pin-2-line"></i>{{ lead.city || 'Ubicación pendiente' }}</span>@if (area(lead)) {<span><i class="ri-ruler-2-line"></i>{{ area(lead) }} m²</span>}</div>
-                  @if (estimate(lead); as estimate) {<div class="estimate-chip">Desde {{ money(estimate) }}</div>}
+                <button
+                  class="lead-card"
+                  draggable="true"
+                  (dragstart)="startDrag(lead, $event)"
+                  (dragend)="draggedLead.set(null)"
+                  (click)="selectedLead.set(lead)"
+                >
+                  <div class="card-top">
+                    <span class="lead-avatar">{{ initials(lead) }}</span
+                    ><span>{{ date(lead.created_at) }}</span>
+                  </div>
+                  <strong>{{ name(lead) }}</strong
+                  ><span class="lead-service">{{ service(lead) }}</span>
+                  <div class="card-meta">
+                    <span
+                      ><i class="ri-map-pin-2-line"></i
+                      >{{ lead.city || "Ubicación pendiente" }}</span
+                    >
+                    @if (area(lead)) {
+                      <span
+                        ><i class="ri-ruler-2-line"></i
+                        >{{ area(lead) }} m²</span
+                      >
+                    }
+                  </div>
+                  @if (estimate(lead); as estimate) {
+                    <div class="estimate-chip">Desde {{ money(estimate) }}</div>
+                  }
                 </button>
-              } @empty { <div class="kanban-empty">Suelta una solicitud aquí</div> }
+              } @empty {
+                <div class="kanban-empty">Suelta una solicitud aquí</div>
+              }
             </div>
           </article>
         }
       </section>
-      <section class="archived-section"><button type="button" class="archived-toggle" (click)="showArchived.set(!showArchived())"><span><i class="ri-archive-stack-line"></i> Solicitudes descartadas</span><b>{{ archivedLeads().length }}</b><i [class]="showArchived() ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i></button>@if (showArchived()) {<div class="archived-list">@for (lead of archivedLeads(); track lead.id) {<button type="button" (click)="selectedLead.set(lead)"><span class="lead-avatar">{{ initials(lead) }}</span><span><strong>{{ name(lead) }}</strong><small>{{ service(lead) }} · {{ lead.city || 'Ubicación pendiente' }}</small></span><span>{{ statuses.find(item => item.value === lead.status)?.label }}</span><i class="ri-arrow-right-line"></i></button>} @empty {<p>No hay solicitudes descartadas.</p>}</div>}</section>
-    }
-    @else if (menu() === 'leads') {
-      <section class="directory"><div class="directory-tools"><h2>{{ filteredLeads().length }} prospectos</h2><label><i class="ri-search-line"></i><input [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Buscar"></label></div><div class="lead-table">@for (lead of filteredLeads(); track lead.id) {<button class="directory-lead" (click)="selectedLead.set(lead)"><span class="lead-avatar">{{ initials(lead) }}</span><span><strong>{{ name(lead) }}</strong><small>{{ lead.phone }} · {{ lead.email || 'Sin correo' }}</small></span><span>{{ service(lead) }}</span><span>{{ lead.city || 'Por confirmar' }}</span><span class="status-label">{{ statuses.find(item => item.value === lead.status)?.label }}</span><i class="ri-arrow-right-line"></i></button>}</div></section>
-    }
-    @else if (menu() === 'portfolio') {
-      <section class="coming-soon"><i class="ri-image-add-line"></i><h2>Fotos del portafolio</h2><p>Este módulo será el único punto de edición para las imágenes públicas de proyectos.</p><button type="button" disabled>Conectar Storage de Supabase</button></section>
-    }
-    @else {
+      <section class="archived-section">
+        <button
+          type="button"
+          class="archived-toggle"
+          (click)="showArchived.set(!showArchived())"
+        >
+          <span
+            ><i class="ri-archive-stack-line"></i> Solicitudes descartadas</span
+          ><b>{{ archivedLeads().length }}</b
+          ><i
+            [class]="
+              showArchived() ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'
+            "
+          ></i>
+        </button>
+        @if (showArchived()) {
+          <div class="archived-list">
+            @for (lead of archivedLeads(); track lead.id) {
+              <button type="button" (click)="selectedLead.set(lead)">
+                <span class="lead-avatar">{{ initials(lead) }}</span
+                ><span
+                  ><strong>{{ name(lead) }}</strong
+                  ><small
+                    >{{ service(lead) }} ·
+                    {{ lead.city || "Ubicación pendiente" }}</small
+                  ></span
+                ><span>{{
+                  statuses.find((item) => item.value === lead.status)?.label
+                }}</span
+                ><i class="ri-arrow-right-line"></i>
+              </button>
+            } @empty {
+              <p>No hay solicitudes descartadas.</p>
+            }
+          </div>
+        }
+      </section>
+    } @else if (menu() === "leads") {
+      <section class="directory">
+        <div class="directory-tools">
+          <h2>{{ filteredLeads().length }} prospectos</h2>
+          <label
+            ><i class="ri-search-line"></i
+            ><input
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+              placeholder="Buscar"
+          /></label>
+        </div>
+        <div class="lead-table">
+          @for (lead of filteredLeads(); track lead.id) {
+            <button class="directory-lead" (click)="selectedLead.set(lead)">
+              <span class="lead-avatar">{{ initials(lead) }}</span
+              ><span
+                ><strong>{{ name(lead) }}</strong
+                ><small
+                  >{{ lead.phone }} · {{ lead.email || "Sin correo" }}</small
+                ></span
+              ><span>{{ service(lead) }}</span
+              ><span>{{ lead.city || "Por confirmar" }}</span
+              ><span class="status-label">{{
+                statuses.find((item) => item.value === lead.status)?.label
+              }}</span
+              ><i class="ri-arrow-right-line"></i>
+            </button>
+          }
+        </div>
+      </section>
+    } @else if (menu() === "portfolio") {
+      <section class="portfolio-console">
+        <header class="portfolio-intro">
+          <div>
+            <p class="drawer-overline">GALERÍA PÚBLICA</p>
+            <h2>Proyectos publicados</h2>
+            <p>
+              Administra las obras y sus imágenes. Solo los proyectos publicados
+              se muestran en el sitio.
+            </p>
+          </div>
+          <div class="portfolio-intro-actions">
+            <button
+              class="new-request"
+              type="button"
+              (click)="newPortfolioProject()"
+            >
+              <i class="ri-add-line"></i> Nuevo proyecto
+            </button>
+            <button
+              type="button"
+              class="selection-toggle"
+              [class.active]="portfolioSelectionMode()"
+              (click)="togglePortfolioSelectionMode()"
+            >
+              <i
+                [class]="
+                  portfolioSelectionMode()
+                    ? 'ri-close-line'
+                    : 'ri-checkbox-multiple-line'
+                "
+              ></i
+              >{{
+                portfolioSelectionMode() ? "Cancelar selección" : "Seleccionar"
+              }}
+            </button>
+            @if (
+              portfolioSelectionMode() && selectedPortfolioProjectIds().length
+            ) {
+              <button
+                type="button"
+                class="delete-selected"
+                (click)="removeSelectedPortfolioProjects()"
+                [disabled]="deletingPortfolioProjects()"
+              >
+                <i class="ri-delete-bin-6-line"></i
+                >{{
+                  deletingPortfolioProjects()
+                    ? "Eliminando..."
+                    : "Eliminar " +
+                      selectedPortfolioProjectIds().length +
+                      " seleccionados"
+                }}
+              </button>
+              <button
+                type="button"
+                class="publish-selected"
+                (click)="toggleSelectedPortfolioVisibility()"
+                [disabled]="deletingPortfolioProjects()"
+              >
+                <i [class]="selectedPortfolioProjectsArePublished() ? 'ri-eye-off-line' : 'ri-eye-line'"></i>{{ selectedPortfolioProjectsArePublished() ? 'Inactivar seleccionados' : 'Activar seleccionados' }}
+              </button>
+            }
+            @if (portfolioSelectionMode()) {
+              <button type="button" class="select-visible" [class.active]="allVisiblePortfolioProjectsSelected()" (click)="toggleAllVisiblePortfolioProjects()"><i class="ri-checkbox-multiple-line"></i>{{ allVisiblePortfolioProjectsSelected() ? 'Quitar visibles' : 'Seleccionar visibles' }}</button>
+            }
+          </div>
+        </header>
+        @if (loadingPortfolio()) {
+          <p class="portfolio-loading">Cargando proyectos...</p>
+        } @else {
+          <div class="portfolio-manager">
+            <div
+              class="portfolio-category-filters"
+              aria-label="Filtrar proyectos por categoría"
+            >
+              <button
+                type="button"
+                [class.active]="portfolioCategoryFilter() === 'all'"
+                (click)="portfolioCategoryFilter.set('all')"
+              >
+                Todos
+              </button>
+              @for (category of portfolioCategories(); track category.id) {
+                <button
+                  type="button"
+                  [class.active]="portfolioCategoryFilter() === category.id"
+                  (click)="portfolioCategoryFilter.set(category.id)"
+                >
+                  {{ category.name }}
+                </button>
+              }
+            </div>
+            <div class="portfolio-list">
+              @for (project of filteredPortfolioProjects(); track project.id) {
+                <article
+                  [class.selected]="portfolioDraft?.id === project.id"
+                  [class.batch-selected]="
+                    isPortfolioProjectSelected(project.id)
+                  "
+                  [class.selection-mode]="portfolioSelectionMode()"
+                  (click)="togglePortfolioProjectSelectionFromCard(project.id, $event)"
+                >
+                  @if (portfolioSelectionMode()) {
+                    <label class="portfolio-select"
+                      ><input
+                        type="checkbox"
+                        [checked]="isPortfolioProjectSelected(project.id)"
+                        (change)="togglePortfolioProjectSelection(project.id)"
+                        [attr.aria-label]="'Seleccionar ' + project.name"
+                    /></label>
+                  }
+                  <img
+                    [src]="
+                      project.portfolio_media.length
+                        ? portfolioMediaUrl(project.portfolio_media[0])
+                        : 'assets/images/logo-inxhinie.png'
+                    "
+                    [alt]="project.portfolio_media[0]?.alt_text || project.name"
+                  />
+                  <div>
+                     <span class="visibility-badge" [class.visible]="project.published">{{
+                       project.published ? "Visible para el público" : "No visible"
+                     }}</span
+                    ><strong>{{ project.name }}</strong
+                    ><small
+                      >{{
+                        project.portfolio_categories?.name || "Sin categoría"
+                      }}
+                      · {{ project.portfolio_media.length }} imágenes</small
+                    >
+                  </div>
+                  <button type="button" (click)="editPortfolioProject(project)">
+                    Editar</button
+                  ><button
+                    type="button"
+                    class="delete-project"
+                    (click)="removePortfolioProject(project)"
+                    aria-label="Eliminar proyecto"
+                  >
+                    <i class="ri-delete-bin-6-line"></i>
+                  </button>
+                </article>
+              } @empty {
+                <p class="portfolio-empty">
+                  Aún no hay proyectos. Crea el primero para comenzar a llenar
+                  la galería pública.
+                </p>
+              }
+            </div>
+            @if (portfolioDraft; as project) {
+              <div
+                class="portfolio-modal-backdrop"
+                (click)="closePortfolioModal()"
+              >
+                <form
+                  class="portfolio-form portfolio-modal"
+                  (ngSubmit)="savePortfolioProject()"
+                  (click)="$event.stopPropagation()"
+                >
+                  @if (savingPortfolio() || uploadingPortfolio()) {
+                    <div class="portfolio-saving-overlay" aria-live="polite">
+                      <div class="portfolio-saving-loader"><i class="ri-loader-4-line spin"></i><strong>{{ uploadingPortfolio() ? 'Subiendo imágenes...' : 'Guardando proyecto...' }}</strong><small>No cierres esta ventana</small></div>
+                    </div>
+                  }
+                  <header>
+                    <div>
+                      <span>{{
+                        project.id ? "EDITAR PROYECTO" : "NUEVO PROYECTO"
+                      }}</span>
+                      <h3>
+                        {{
+                          project.id
+                            ? project.name || "Sin título"
+                            : "Detalles de la obra"
+                        }}
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      class="drawer-close"
+                      (click)="closePortfolioModal()"
+                      aria-label="Cerrar"
+                    >
+                      <i class="ri-close-line"></i>
+                    </button>
+                  </header>
+                  <label
+                    >Nombre<input
+                      [(ngModel)]="project.name"
+                      name="portfolio-name"
+                      required /></label
+                  ><label
+                    >Categoría<select
+                      [(ngModel)]="project.category_id"
+                      name="portfolio-category"
+                      required
+                    >
+                      <option [ngValue]="null" disabled>
+                        Selecciona una categoría
+                      </option>
+                      @for (
+                        category of portfolioCategories();
+                        track category.id
+                      ) {
+                        <option [value]="category.id">
+                          {{ category.name }}
+                        </option>
+                      }
+                    </select></label
+                  ><label class="wide"
+                    >Descripción<textarea
+                      [(ngModel)]="project.description"
+                      name="portfolio-description"
+                      rows="4"
+                      required
+                    ></textarea></label
+                  ><label
+                    >Ubicación<input
+                      [(ngModel)]="project.location_label"
+                      name="portfolio-location"
+                      placeholder="Ciudad o zona" /></label
+                  ><label
+                    >Fecha de terminación<input
+                      [(ngModel)]="project.completed_at"
+                      name="portfolio-completed"
+                      type="date" /></label
+                  ><label
+                    >Área (m²)<input
+                      [(ngModel)]="project.area_sqm"
+                      name="portfolio-area"
+                      type="number"
+                      min="0" /></label
+                  ><label
+                    >Duración (días)<input
+                      [(ngModel)]="project.duration_days"
+                      name="portfolio-duration"
+                      type="number"
+                      min="0" /></label
+                  ><label class="project-switch"
+                    ><input
+                      [(ngModel)]="project.published"
+                      name="portfolio-published"
+                      type="checkbox"
+                    /><span>Publicado en el sitio</span></label
+                  ><label class="project-switch"
+                    ><input
+                      [(ngModel)]="project.featured"
+                      name="portfolio-featured"
+                      type="checkbox"
+                    /><span>Proyecto destacado</span></label
+                  >
+                  <section class="portfolio-upload wide">
+                    <header>
+                      <div>
+                        <span>IMÁGENES</span>
+                        <h3>Archivos del proyecto</h3>
+                      </div>
+                      <div class="upload-actions">
+                        <label class="upload-button"
+                          ><i class="ri-upload-cloud-2-line"></i>Subir
+                          imágenes<input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            multiple
+                            [disabled]="uploadingPortfolio()"
+                            (change)="stagePortfolioFiles($event)"
+                        /></label>
+                        <button
+                          type="button"
+                          class="preview-images"
+                          [disabled]="!pendingPortfolioImages().length"
+                          (click)="openPortfolioImagePreview()"
+                          aria-label="Ver imágenes seleccionadas"
+                        >
+                          <i class="ri-eye-line"></i>
+                        </button>
+                      </div>
+                    </header>
+                    <p>
+                      JPG, PNG o WebP, hasta 8 MB por archivo. Se guardarán en
+                      el bucket al guardar el proyecto.
+                    </p>
+                  </section>
+                  <button
+                    class="submit-request wide"
+                    type="submit"
+                    [disabled]="savingPortfolio() || uploadingPortfolio()"
+                  >
+                    {{
+                      savingPortfolio() || uploadingPortfolio()
+                        ? "Guardando..."
+                        : project.id
+                          ? "Guardar cambios"
+                          : "Crear proyecto"
+                    }}
+                  </button>
+                  @if (project.id) {
+                    <section class="portfolio-upload">
+                      <header>
+                        <div>
+                          <span>IMÁGENES GUARDADAS</span>
+                          <h3>Archivos del proyecto</h3>
+                        </div>
+                        @if (project.id) {
+                          <div class="media-selection-actions">
+                            <button type="button" class="media-cover-filter" [class.active]="showPortfolioCoverOnly()" (click)="showPortfolioCoverOnly.update((visible) => !visible)"><i [class]="showPortfolioCoverOnly() ? 'ri-eye-off-line' : 'ri-star-line'"></i>{{ showPortfolioCoverOnly() ? 'Ver todas' : 'Ver portada' }}</button>
+                            <button type="button" class="selection-toggle" [class.active]="portfolioMediaSelectionMode()" [disabled]="processingPortfolioMedia()" (click)="togglePortfolioMediaSelectionMode()"><i [class]="portfolioMediaSelectionMode() ? 'ri-close-line' : 'ri-checkbox-multiple-line'"></i>{{ portfolioMediaSelectionMode() ? 'Cancelar selección' : 'Seleccionar' }}</button>
+                            @if (portfolioMediaSelectionMode() && selectedPortfolioMediaIds().length) {
+                              <button type="button" class="delete-selected" [disabled]="processingPortfolioMedia()" (click)="removeSelectedPortfolioMedia()"><i [class]="processingPortfolioMedia() ? 'ri-loader-4-line spin' : 'ri-delete-bin-6-line'"></i>{{ processingPortfolioMedia() ? 'Eliminando...' : 'Eliminar ' + selectedPortfolioMediaIds().length + ' seleccionadas' }}</button>
+                            }
+                          </div>
+                        }
+                      </header>
+                      <p>La primera imagen se usa como portada.</p>
+                       @if (processingPortfolioMedia()) {
+                         <div class="media-loading"><i class="ri-loader-4-line spin"></i> Procesando imágenes...</div>
+                       }
+                       <div class="portfolio-media-grid" [class.media-processing]="processingPortfolioMedia()">
+                        @for (
+                           media of visiblePortfolioMedia(project.id);
+                          track media.id
+                        ) {
+                          <figure [class.media-selected]="selectedPortfolioMediaIds().includes(media.id)" [class.media-selection-mode]="portfolioMediaSelectionMode()" (click)="portfolioMediaSelectionMode() && togglePortfolioMediaSelection(media.id)">
+                            <img
+                              [src]="portfolioMediaUrl(media)"
+                              [alt]="media.alt_text"
+                            /><button
+                              type="button"
+                              class="portfolio-cover"
+                              [class.active]="media.sort_order === 0"
+                              [disabled]="processingPortfolioMedia() || media.sort_order === 0"
+                              (click)="choosePortfolioCover($event, media)"
+                              [attr.aria-label]="media.sort_order === 0 ? 'Imagen de portada actual' : 'Usar como portada'"
+                            ><i class="ri-star-line"></i></button><button
+                              type="button"
+                              (click)="portfolioMediaSelectionMode() ? $event.stopPropagation() : removePortfolioMedia(media)"
+                               [disabled]="processingPortfolioMedia()"
+                               aria-label="Eliminar imagen"
+                            >
+                              <i class="ri-delete-bin-6-line"></i>
+                            </button>
+                          </figure>
+                        } @empty {
+                          <span>Aún no has subido imágenes.</span>
+                        }
+                      </div>
+                    </section>
+                  }
+                </form>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    } @else {
       @if (catalog(); as config) {
         <section class="catalog-console">
-          <header class="catalog-intro"><div><p class="drawer-overline">COTIZADOR RÁPIDO · REV 01</p><h2>Reglas de cotización</h2><p>Define qué ve el cliente y cómo se calcula cada estimación.</p></div><button class="new-request" type="button" (click)="saveCatalog()" [disabled]="savingCatalog()"><i class="ri-save-3-line"></i>{{ savingCatalog() ? 'Guardando...' : 'Guardar cambios' }}</button></header>
-          <section class="formula-deck"><div class="formula-heading"><span>01 / MOTOR DE ESTIMACIÓN</span><strong>Rango final</strong></div><label><span>Margen inferior</span><div><input [(ngModel)]="config.varianceLow" type="number" step=".01" min="0"><b>×</b></div></label><i class="ri-arrow-right-line"></i><label><span>Margen superior</span><div><input [(ngModel)]="config.varianceHigh" type="number" step=".01" min="0"><b>×</b></div></label><p>Base por m² × calidad + adicional por m²</p></section>
-          <section class="catalog-grid">
-            <article class="catalog-module services-module"><header><span>02 / ESPECIALIDADES</span><button type="button" (click)="addService()"><i class="ri-add-line"></i> Añadir</button></header><div class="rate-columns"><span>Nombre visible</span><span>Tarifa / m²</span></div>@for (service of config.services; track $index) {<div class="rate-row"><input [(ngModel)]="service.name" [name]="'service-name-' + $index"><div><span>$</span><input [(ngModel)]="service.rate" [name]="'service-rate-' + $index" type="number" min="0"></div><button type="button" (click)="removeItem('services', $index)" aria-label="Eliminar especialidad"><i class="ri-delete-bin-6-line"></i></button></div>}</article>
-            <article class="catalog-module"><header><span>03 / MATERIALES</span><button type="button" (click)="addMaterial()"><i class="ri-add-line"></i></button></header><div class="chip-editor">@for (material of config.materials; track $index) {<label><input [(ngModel)]="config.materials[$index]" [name]="'material-' + $index"><button type="button" (click)="removeItem('materials', $index)" aria-label="Eliminar material"><i class="ri-close-line"></i></button></label>}</div></article>
-            <article class="catalog-module"><header><span>04 / TIPO DE INMUEBLE</span><button type="button" (click)="addProperty()"><i class="ri-add-line"></i></button></header><div class="chip-editor">@for (property of config.properties; track $index) {<label><input [(ngModel)]="config.properties[$index]" [name]="'property-' + $index"><button type="button" (click)="removeItem('properties', $index)" aria-label="Eliminar inmueble"><i class="ri-close-line"></i></button></label>}</div></article>
-            <article class="catalog-module"><header><span>05 / NIVEL DE MATERIALES</span><button type="button" (click)="addQuality()"><i class="ri-add-line"></i></button></header><div class="factor-list">@for (quality of config.qualities; track quality.key; let index = $index) {<div><input [(ngModel)]="quality.label" [name]="'quality-label-' + index"><label>Factor<input [(ngModel)]="quality.multiplier" [name]="'quality-multiplier-' + index" type="number" step=".01" min="0"></label><button type="button" (click)="removeItem('qualities', index)" aria-label="Eliminar calidad"><i class="ri-delete-bin-6-line"></i></button></div>}</div></article>
-            <article class="catalog-module addons-module"><header><span>06 / ADICIONALES</span><button type="button" (click)="addAddon()"><i class="ri-add-line"></i></button></header><div class="factor-list">@for (addon of config.addons; track addon.key; let index = $index) {<div><input [(ngModel)]="addon.label" [name]="'addon-label-' + index"><label>$/m²<input [(ngModel)]="addon.rate" [name]="'addon-rate-' + index" type="number" min="0"></label><button type="button" (click)="removeItem('addons', index)" aria-label="Eliminar adicional"><i class="ri-delete-bin-6-line"></i></button></div>}</div></article>
+          @if (savingCatalog()) {
+            <div class="catalog-saving-overlay" aria-live="polite">
+              <div class="portfolio-saving-loader">
+                <i class="ri-loader-4-line spin"></i><strong>Guardando cambios...</strong><small>Actualizando reglas y catálogos</small>
+              </div>
+            </div>
+          }
+          <header class="catalog-intro">
+            <div>
+              <p class="drawer-overline">COTIZADOR RÁPIDO · REV 01</p>
+              <h2>Reglas de cotización</h2>
+              <p>Define qué ve el cliente y cómo se calcula cada estimación.</p>
+            </div>
+            <button
+              class="new-request"
+              type="button"
+              (click)="saveCatalog()"
+              [disabled]="savingCatalog()"
+            >
+              <i class="ri-save-3-line"></i
+              >{{ savingCatalog() ? "Guardando..." : "Guardar cambios" }}
+            </button>
+          </header>
+          <nav class="catalog-tabs" aria-label="Secciones de catálogos">
+            <button type="button" [class.active]="catalogTab() === 'rules'" (click)="catalogTab.set('rules')">
+              <i class="ri-equalizer-line"></i> Motor de estimación
+            </button>
+            <button type="button" [class.active]="catalogTab() === 'catalogs'" (click)="catalogTab.set('catalogs')">
+              <i class="ri-list-settings-line"></i> Catálogos
+            </button>
+            <button type="button" [class.active]="catalogTab() === 'categories'" (click)="catalogTab.set('categories')">
+              <i class="ri-folder-line"></i> Categorías
+            </button>
+          </nav>
+          @if (catalogTab() === 'rules') {
+          <section class="formula-deck">
+            <div class="formula-heading">
+              <span>01 / MOTOR DE ESTIMACIÓN</span><strong>Rango final</strong>
+            </div>
+            <label
+              ><span>Margen inferior</span>
+              <div>
+                <input
+                  [(ngModel)]="config.varianceLow"
+                  type="number"
+                  step=".01"
+                  min="0"
+                /><b>×</b>
+              </div></label
+            ><i class="ri-arrow-right-line"></i
+            ><label
+              ><span>Margen superior</span>
+              <div>
+                <input
+                  [(ngModel)]="config.varianceHigh"
+                  type="number"
+                  step=".01"
+                  min="0"
+                /><b>×</b>
+              </div></label
+            >
+            <p>Base por m² × calidad + adicional por m²</p>
           </section>
+          }
+          @if (catalogTab() === 'catalogs') {
+          <section class="catalog-grid">
+            <article class="catalog-module services-module">
+              <header>
+                <span>02 / ESPECIALIDADES</span
+                ><button type="button" (click)="addService()">
+                  <i class="ri-add-line"></i> Añadir
+                </button>
+              </header>
+              <div class="rate-columns">
+                <span>Nombre visible</span><span>Tarifa / m²</span>
+              </div>
+              @for (service of config.services; track $index; let serviceIndex = $index) {
+                <div class="rate-row">
+                  <input
+                    [(ngModel)]="service.name"
+                    [name]="'service-name-' + $index"
+                  />
+                  <div>
+                    <span>$</span
+                    ><input
+                      [(ngModel)]="service.rate"
+                      [name]="'service-rate-' + $index"
+                      type="number"
+                      min="0"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    (click)="removeItem('services', $index)"
+                    aria-label="Eliminar especialidad"
+                  >
+                    <i class="ri-delete-bin-6-line"></i>
+                  </button>
+                </div>
+                <div class="service-materials">
+                  <span>Materiales disponibles</span>
+                  <div>
+                    @for (material of config.materials; track material) {
+                      <button
+                        type="button"
+                        [class.active]="service.materials.includes(material)"
+                        (click)="toggleServiceMaterial(serviceIndex, material)"
+                        [attr.aria-pressed]="service.materials.includes(material)"
+                      >{{ material }}</button>
+                    }
+                  </div>
+                </div>
+              }
+            </article>
+            <article class="catalog-module">
+              <header>
+                <span>03 / MATERIALES</span
+                ><button type="button" (click)="addMaterial()">
+                  <i class="ri-add-line"></i>
+                </button>
+              </header>
+              <div class="chip-editor">
+                @for (material of config.materials; track $index) {
+                  <label
+                    ><input
+                      [(ngModel)]="config.materials[$index]"
+                      [name]="'material-' + $index" /><button
+                      type="button"
+                      (click)="removeItem('materials', $index)"
+                      aria-label="Eliminar material"
+                    >
+                      <i class="ri-close-line"></i></button
+                  ></label>
+                }
+              </div>
+            </article>
+            <article class="catalog-module">
+              <header>
+                <span>04 / TIPO DE INMUEBLE</span
+                ><button type="button" (click)="addProperty()">
+                  <i class="ri-add-line"></i>
+                </button>
+              </header>
+              <div class="chip-editor">
+                @for (property of config.properties; track $index) {
+                  <label
+                    ><input
+                      [(ngModel)]="config.properties[$index]"
+                      [name]="'property-' + $index" /><button
+                      type="button"
+                      (click)="removeItem('properties', $index)"
+                      aria-label="Eliminar inmueble"
+                    >
+                      <i class="ri-close-line"></i></button
+                  ></label>
+                }
+              </div>
+            </article>
+            <article class="catalog-module">
+              <header>
+                <span>05 / NIVEL DE MATERIALES</span
+                ><button type="button" (click)="addQuality()">
+                  <i class="ri-add-line"></i>
+                </button>
+              </header>
+              <div class="factor-list">
+                @for (
+                  quality of config.qualities;
+                  track quality.key;
+                  let index = $index
+                ) {
+                  <div>
+                    <input
+                      [(ngModel)]="quality.label"
+                      [name]="'quality-label-' + index"
+                    /><label
+                      >Factor<input
+                        [(ngModel)]="quality.multiplier"
+                        [name]="'quality-multiplier-' + index"
+                        type="number"
+                        step=".01"
+                        min="0" /></label
+                    ><button
+                      type="button"
+                      (click)="removeItem('qualities', index)"
+                      aria-label="Eliminar calidad"
+                    >
+                      <i class="ri-delete-bin-6-line"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            </article>
+            <article class="catalog-module addons-module">
+              <header>
+                <span>06 / ADICIONALES</span
+                ><button type="button" (click)="addAddon()">
+                  <i class="ri-add-line"></i>
+                </button>
+              </header>
+              <div class="factor-list">
+                @for (
+                  addon of config.addons;
+                  track addon.key;
+                  let index = $index
+                ) {
+                  <div>
+                    <input
+                      [(ngModel)]="addon.label"
+                      [name]="'addon-label-' + index"
+                    /><label
+                      >$/m²<input
+                        [(ngModel)]="addon.rate"
+                        [name]="'addon-rate-' + index"
+                        type="number"
+                        min="0" /></label
+                    ><button
+                      type="button"
+                      (click)="removeItem('addons', index)"
+                      aria-label="Eliminar adicional"
+                    >
+                      <i class="ri-delete-bin-6-line"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+             </article>
+           </section>
+          }
+          @if (catalogTab() === 'categories') {
+          <section class="portfolio-categories">
+            <header>
+              <div>
+                <p class="drawer-overline">PORTAFOLIO</p>
+                <h3>Categorías de proyectos</h3>
+              </div>
+              <form (ngSubmit)="createPortfolioCategory()">
+                <input
+                  [(ngModel)]="newPortfolioCategoryName"
+                  name="new-portfolio-category"
+                  placeholder="Nueva categoría"
+                /><button class="new-request" type="submit">Añadir</button>
+              </form>
+            </header>
+            <div>
+              @for (category of portfolioCategories(); track category.id) {
+                <article>
+                  <input
+                    [(ngModel)]="category.name"
+                    [name]="'portfolio-category-' + category.id"
+                  /><button
+                    type="button"
+                    (click)="savePortfolioCategory(category)"
+                  >
+                    Guardar</button
+                  ><button
+                    type="button"
+                    class="delete-project"
+                    (click)="removePortfolioCategory(category)"
+                    aria-label="Eliminar categoría"
+                  >
+                    <i class="ri-delete-bin-6-line"></i>
+                  </button>
+                </article>
+              } @empty {
+                <p class="portfolio-empty">
+                  Aún no hay categorías. Crea una antes de agregar proyectos.
+                </p>
+              }
+            </div>
+          </section>
+          }
         </section>
-      } @else { <section class="coming-soon"><i class="ri-loader-4-line"></i><h2>Cargando catálogos</h2><p>Conectando las reglas activas del cotizador.</p></section> }
+      } @else {
+        <section class="coming-soon">
+          <i class="ri-loader-4-line"></i>
+          <h2>Cargando catálogos</h2>
+          <p>Conectando las reglas activas del cotizador.</p>
+        </section>
+      }
     }
   </main>
 
   @if (selectedLead(); as lead) {
-    <aside class="lead-drawer" aria-label="Detalle de solicitud"><button class="drawer-close" (click)="selectedLead.set(null)" aria-label="Cerrar detalle"><i class="ri-close-line"></i></button><div class="drawer-overline">SOLICITUD {{ lead.id.startsWith('demo-') ? 'DE DEMOSTRACIÓN' : 'ACTIVA' }}</div><div class="drawer-person"><span class="lead-avatar large">{{ initials(lead) }}</span><div><h2>{{ name(lead) }}</h2><p>{{ lead.city || 'Ubicación pendiente' }}</p></div></div><section><span>Proyecto solicitado</span><strong>{{ service(lead) }}</strong>@if (area(lead)) {<p>{{ area(lead) }} m² aproximados</p>}</section><section><span>Descripción</span><p>{{ description(lead) }}</p></section><section><span>Estado</span><select [ngModel]="lead.status" (ngModelChange)="changeStatus(lead, $event)">@for (status of statuses; track status.value) {<option [value]="status.value">{{ status.label }}</option>}</select></section><div class="drawer-actions"><a [href]="whatsapp(lead)" target="_blank" rel="noopener"><i class="ri-whatsapp-line"></i> WhatsApp</a><a [href]="'tel:+52' + lead.phone.replaceAll(' ', '')"><i class="ri-phone-line"></i> Llamar</a></div></aside>
+      <aside class="lead-drawer" aria-label="Detalle de solicitud">
+      <button
+        class="drawer-close"
+        (click)="selectedLead.set(null)"
+        aria-label="Cerrar detalle"
+      >
+        <i class="ri-close-line"></i>
+      </button>
+      <div class="drawer-overline drawer-animate drawer-animate-1">
+        SOLICITUD
+        {{ lead.id.startsWith("demo-") ? "DE DEMOSTRACIÓN" : "ACTIVA" }}
+      </div>
+      <div class="drawer-person drawer-animate drawer-animate-2">
+        <span class="lead-avatar large">{{ initials(lead) }}</span>
+        <div>
+          <h2>{{ name(lead) }}</h2>
+          <p>{{ lead.city || "Ubicación pendiente" }}</p>
+        </div>
+      </div>
+      <section class="drawer-animate drawer-animate-3">
+        <span>Proyecto solicitado</span><strong>{{ service(lead) }}</strong>
+        @if (area(lead)) {
+          <p>{{ area(lead) }} m² aproximados</p>
+        }
+      </section>
+      <section class="drawer-animate drawer-animate-4">
+        <span>Descripción</span>
+        <p>{{ description(lead) }}</p>
+      </section>
+      <section class="drawer-animate drawer-animate-5">
+        <span>Estado</span
+        ><select
+          [ngModel]="lead.status"
+          (ngModelChange)="changeStatus(lead, $event)"
+        >
+          @for (status of statuses; track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+          }
+        </select>
+      </section>
+      <div class="drawer-actions drawer-animate drawer-animate-6">
+        <a [href]="whatsapp(lead)" target="_blank" rel="noopener"
+          ><i class="ri-whatsapp-line"></i> WhatsApp</a
+        ><a [href]="'tel:+52' + lead.phone.replaceAll(' ', '')"
+          ><i class="ri-phone-line"></i> Llamar</a
+        >
+      </div>
+    </aside>
   }
   @if (newRequestOpen()) {
-    <div class="request-modal-backdrop" (click)="newRequestOpen.set(false)"><section class="request-modal" (click)="$event.stopPropagation()"><button class="drawer-close" (click)="newRequestOpen.set(false)" aria-label="Cerrar"><i class="ri-close-line"></i></button><p class="drawer-overline">CAPTURA MANUAL</p><h2>Nueva solicitud</h2><p>Registra un prospecto recibido por atención directa.</p><form (ngSubmit)="createManualLead()"><label>Nombre completo<input [(ngModel)]="manualLead.name" name="name" required></label><label>Teléfono<input [(ngModel)]="manualLead.phone" name="phone" required></label><label>Correo electrónico<input [(ngModel)]="manualLead.email" name="email" type="email"></label><label>Ciudad / ubicación<input [(ngModel)]="manualLead.city" name="city"></label><label>Servicio solicitado<input [(ngModel)]="manualLead.service" name="service" required></label><label>Superficie aproximada (m²)<input [(ngModel)]="manualLead.area" name="area" type="number" min="1"></label><label>Origen<select [(ngModel)]="manualLead.source" name="source"><option value="whatsapp">WhatsApp</option><option value="instagram">Instagram</option><option value="referral">Referido</option><option value="website">Sitio web</option></select></label><label class="wide">Descripción<textarea [(ngModel)]="manualLead.description" name="description" rows="4" required></textarea></label><button class="submit-request" type="submit" [disabled]="savingRequest()">{{ savingRequest() ? 'Guardando...' : 'Registrar solicitud' }}</button></form></section></div>
+    <div class="request-modal-backdrop" (click)="newRequestOpen.set(false)">
+      <section class="request-modal" (click)="$event.stopPropagation()">
+        <button
+          class="drawer-close"
+          (click)="newRequestOpen.set(false)"
+          aria-label="Cerrar"
+        >
+          <i class="ri-close-line"></i>
+        </button>
+        <p class="drawer-overline">CAPTURA MANUAL</p>
+        <h2>Nueva solicitud</h2>
+        <p>Registra un prospecto recibido por atención directa.</p>
+        <form (ngSubmit)="createManualLead()">
+          <label
+            >Nombre completo<input
+              [(ngModel)]="manualLead.name"
+              name="name"
+              required /></label
+          ><label
+            >Teléfono<input
+              [(ngModel)]="manualLead.phone"
+              name="phone"
+              required /></label
+          ><label
+            >Correo electrónico<input
+              [(ngModel)]="manualLead.email"
+              name="email"
+              type="email" /></label
+          ><label
+            >Ciudad / ubicación<input
+              [(ngModel)]="manualLead.city"
+              name="city" /></label
+          ><label
+            >Servicio solicitado<input
+              [(ngModel)]="manualLead.service"
+              name="service"
+              required /></label
+          ><label
+            >Superficie aproximada (m²)<input
+              [(ngModel)]="manualLead.area"
+              name="area"
+              type="number"
+              min="1" /></label
+          ><label
+            >Origen<select [(ngModel)]="manualLead.source" name="source">
+              <option value="whatsapp">WhatsApp</option>
+              <option value="instagram">Instagram</option>
+              <option value="referral">Referido</option>
+              <option value="website">Sitio web</option>
+            </select></label
+          ><label class="wide"
+            >Descripción<textarea
+              [(ngModel)]="manualLead.description"
+              name="description"
+              rows="4"
+              required
+            ></textarea></label
+          ><button
+            class="submit-request"
+            type="submit"
+            [disabled]="savingRequest()"
+          >
+            {{ savingRequest() ? "Guardando..." : "Registrar solicitud" }}
+          </button>
+        </form>
+      </section>
+    </div>
+  }
+  @if (portfolioImagePreview(); as image) {
+    <div class="portfolio-image-preview" (click)="closePortfolioImagePreview()">
+      <figure (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="drawer-close"
+          (click)="closePortfolioImagePreview()"
+          aria-label="Cerrar vista previa"
+        >
+          <i class="ri-close-line"></i>
+        </button>
+        @if (pendingPortfolioImages().length > 1) {
+          <button
+            type="button"
+            class="preview-navigation previous"
+            (click)="changePortfolioImagePreview(-1)"
+            aria-label="Ver imagen anterior"
+          >
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+          <button
+            type="button"
+            class="preview-navigation next"
+            (click)="changePortfolioImagePreview(1)"
+            aria-label="Ver imagen siguiente"
+          >
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        }
+        <img [src]="image.url" [alt]="image.alt" />
+        <figcaption>
+          {{ portfolioImagePreviewIndex() + 1 }} /
+          {{ pendingPortfolioImages().length }}
+        </figcaption>
+      </figure>
+    </div>
+  }
+  @if (confirmationDialog(); as dialog) {
+    <div class="confirmation-backdrop" (click)="resolveConfirmation(false)">
+      <section class="confirmation-dialog" role="alertdialog" aria-modal="true" [attr.aria-label]="dialog.title" (click)="$event.stopPropagation()">
+        <div class="confirmation-mark"><i class="ri-error-warning-line"></i></div>
+        <p class="drawer-overline">{{ dialog.title }}</p>
+        <h2>¿Continuar con esta acción?</h2>
+        <p>{{ dialog.message }}</p>
+        <div class="confirmation-actions">
+          <button type="button" class="confirmation-cancel" (click)="resolveConfirmation(false)">Cancelar</button>
+          <button type="button" class="confirmation-accept" (click)="resolveConfirmation(true)">Eliminar</button>
+        </div>
+      </section>
+    </div>
+  }
+  @if (catalogExitDialog()) {
+    <div class="confirmation-backdrop" (click)="resolveCatalogExit('cancel')">
+      <section class="confirmation-dialog catalog-exit-dialog" role="alertdialog" aria-modal="true" aria-label="Cambios sin guardar" (click)="$event.stopPropagation()">
+        <div class="confirmation-mark"><i class="ri-save-3-line"></i></div>
+        <p class="drawer-overline">CAMBIOS SIN GUARDAR</p>
+        <h2>¿Guardar antes de salir?</h2>
+        <p>Hay cambios en las reglas de cotización que aún no se han guardado.</p>
+        <div class="confirmation-actions catalog-exit-actions">
+          <button type="button" class="confirmation-cancel" (click)="resolveCatalogExit('cancel')">Cancelar</button>
+          <button type="button" class="confirmation-discard" (click)="resolveCatalogExit('discard')">Descartar</button>
+          <button type="button" class="confirmation-save" (click)="resolveCatalogExit('save')">Guardar cambios</button>
+        </div>
+      </section>
+    </div>
+  }
+  @if (catalogSavedToast()) {
+    <div class="catalog-saved-toast" role="status" aria-live="polite">
+      <i class="ri-checkbox-circle-line"></i><span><strong>Cambios guardados</strong><small>Las reglas de cotización se actualizaron correctamente.</small></span>
+    </div>
   }
 </div>
